@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="310" viewBox="0 0 1200 310" role="img" aria-labelledby="mod-title mod-desc">
+  <title id="mod-title">七个交互实验 · 7 interactive experiments</title>
+  <desc id="mod-desc">七个实验视图一览：傅里叶变换、拉普拉斯 3D 曲面、变换原理动画、采样与混叠、信号性质、卷积、系统与零极点。每个卡片配有一个项目原生的小示意图。</desc>
+
+  <rect width="1200" height="310" fill="#f6f1e3"/>
+
+  <!-- ============ 01 傅里叶变换 ============ -->
+  <g transform="translate(54 30)">
+    <rect width="264" height="118" rx="10" fill="#fbf8ef" stroke="#c4b795" stroke-width="1"/>
+    <text x="20" y="42" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-weight="700" font-size="26" fill="#d4451f">01</text>
+    <text x="64" y="40" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-weight="900" font-size="21" fill="#1d1a13">傅里叶变换</text>
+    <text x="64" y="62" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="18" fill="#6b6250">Fourier Transform</text>
+    <g transform="translate(20 76)">
+      <line x1="0" y1="30" x2="224" y2="30" stroke="#c4b795" stroke-width="1.2"/>
+      <path d="M0,29 L30,28 L55,26 L70,18 L82,4 L94,18 L110,26 L150,28 L224,29" fill="none" stroke="#0e7490" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- ============ 02 拉普拉斯·3D ============ -->
+  <g transform="translate(330 30)">
+    <rect width="264" height="118" rx="10" fill="#fbf8ef" stroke="#c4b795" stroke-width="1"/>
+    <text x="20" y="42" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-weight="700" font-size="26" fill="#d4451f">02</text>
+    <text x="64" y="40" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-weight="900" font-size="21" fill="#1d1a13">拉普拉斯·3D</text>
+    <text x="64" y="62" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="18" fill="#6b6250">Laplace 3D</text>
+    <g transform="translate(20 76)">
+      <line x1="0" y1="30" x2="224" y2="30" stroke="#c4b795" stroke-width="1.2"/>
+      <path d="M40,30 Q60,2 80,30" fill="none" stroke="#1d1a13" stroke-width="2"/>
+      <path d="M130,30 Q150,12 170,30" fill="none" stroke="#1d1a13" stroke-width="2"/>
+      <line x1="105" y1="0" x2="105" y2="30" stroke="#b45309" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- ============ 03 变换原理动画 ============ -->
+  <g transform="translate(606 30)">
+    <rect width="264" height="118" rx="10" fill="#fbf8ef" stroke="#c4b795" stroke-width="1"/>
+    <text x="20" y="42" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-weight="700" font-size="26" fill="#d4451f">03</text>
+    <text x="64" y="40" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-weight="900" font-size="21" fill="#1d1a13">变换原理动画</text>
+    <text x="64" y="62" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="18" fill="#6b6250">FT Integral Demo</text>
+    <g transform="translate(20 76)">
+      <path d="M10,30 C10,12 26,4 34,12 C42,20 34,30 24,26 C18,23 20,15 26,16" fill="none" stroke="#d4451f" stroke-width="2"/>
+      <line x1="52" y1="0" x2="52" y2="30" stroke="#c4b795" stroke-width="1.2"/>
+      <path d="M70,28 L92,24 L114,20 L136,17 L158,15 L180,14 L202,14 L224,14" fill="none" stroke="#0e7490" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- ============ 04 采样·混叠 ============ -->
+  <g transform="translate(882 30)">
+    <rect width="264" height="118" rx="10" fill="#fbf8ef" stroke="#c4b795" stroke-width="1"/>
+    <text x="20" y="42" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-weight="700" font-size="26" fill="#d4451f">04</text>
+    <text x="64" y="40" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-weight="900" font-size="21" fill="#1d1a13">采样·混叠</text>
+    <text x="64" y="62" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="18" fill="#6b6250">Sampling &amp; Aliasing</text>
+    <g transform="translate(20 76)">
+      <line x1="0" y1="15" x2="224" y2="15" stroke="#c4b795" stroke-width="1.2"/>
+      <path d="M0,15 Q28,-12 56,15 Q84,42 112,15 Q140,-12 168,15 Q196,42 224,15" fill="none" stroke="#c4b795" stroke-width="1.6"/>
+      <g stroke="#1d1a13" stroke-width="2">
+        <line x1="0" y1="7" x2="0" y2="23"/><line x1="28" y1="0" x2="28" y2="12"/><line x1="56" y1="7" x2="56" y2="23"/><line x1="84" y1="18" x2="84" y2="30"/><line x1="112" y1="7" x2="112" y2="23"/><line x1="140" y1="0" x2="140" y2="12"/><line x1="168" y1="7" x2="168" y2="23"/><line x1="196" y1="18" x2="196" y2="30"/><line x1="224" y1="7" x2="224" y2="23"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- ============ 05 信号性质 ============ -->
+  <g transform="translate(192 160)">
+    <rect width="264" height="118" rx="10" fill="#fbf8ef" stroke="#c4b795" stroke-width="1"/>
+    <text x="20" y="42" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-weight="700" font-size="26" fill="#d4451f">05</text>
+    <text x="64" y="40" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-weight="900" font-size="21" fill="#1d1a13">信号性质</text>
+    <text x="64" y="62" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="18" fill="#6b6250">Properties</text>
+    <g transform="translate(20 76)">
+      <line x1="0" y1="30" x2="224" y2="30" stroke="#c4b795" stroke-width="1.2"/>
+      <path d="M0,29 L40,27 L64,12 L78,2 L92,12 L116,27 L224,29" fill="none" stroke="#0e7490" stroke-width="2"/>
+      <path d="M0,29 L60,27 L92,10 L106,2 L120,10 L142,27 L224,29" fill="none" stroke="#be123c" stroke-width="1.6" stroke-dasharray="5 4"/>
+    </g>
+  </g>
+
+  <!-- ============ 06 卷积 ============ -->
+  <g transform="translate(468 160)">
+    <rect width="264" height="118" rx="10" fill="#fbf8ef" stroke="#c4b795" stroke-width="1"/>
+    <text x="20" y="42" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-weight="700" font-size="26" fill="#d4451f">06</text>
+    <text x="64" y="40" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-weight="900" font-size="21" fill="#1d1a13">卷积</text>
+    <text x="64" y="62" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="18" fill="#6b6250">Convolution</text>
+    <g transform="translate(20 76)">
+      <line x1="0" y1="30" x2="224" y2="30" stroke="#c4b795" stroke-width="1.2"/>
+      <path d="M20,30 L20,6 L52,6 L52,30 Z" fill="none" stroke="#1d1a13" stroke-width="1.8"/>
+      <path d="M76,30 L76,6 L108,6 L108,30 Z" fill="none" stroke="#1d1a13" stroke-width="1.8"/>
+      <path d="M140,2 L204,30 L140,30 Z" fill="#d4451f" fill-opacity="0.25" stroke="#d4451f" stroke-width="2"/>
+    </g>
+  </g>
+
+  <!-- ============ 07 系统·零极点 ============ -->
+  <g transform="translate(744 160)">
+    <rect width="264" height="118" rx="10" fill="#fbf8ef" stroke="#c4b795" stroke-width="1"/>
+    <text x="20" y="42" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-weight="700" font-size="26" fill="#d4451f">07</text>
+    <text x="64" y="40" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-weight="900" font-size="21" fill="#1d1a13">系统·零极点</text>
+    <text x="64" y="62" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="18" fill="#6b6250">Systems &amp; Pole-Zero</text>
+    <g transform="translate(20 76)">
+      <line x1="0" y1="15" x2="224" y2="15" stroke="#c4b795" stroke-width="1.2"/>
+      <line x1="112" y1="0" x2="112" y2="30" stroke="#b45309" stroke-width="2"/>
+      <rect x="34" y="5" width="20" height="20" fill="#0e7490" fill-opacity="0.10"/>
+      <g stroke="#b91c1c" stroke-width="2.2" stroke-linecap="round">
+        <line x1="82" y1="5" x2="92" y2="15"/><line x1="92" y1="5" x2="82" y2="15"/>
+        <line x1="82" y1="17" x2="92" y2="27"/><line x1="92" y1="17" x2="82" y2="27"/>
+      </g>
+      <circle cx="150" cy="15" r="5" fill="none" stroke="#1d4ed8" stroke-width="2"/>
+    </g>
+  </g>
+</svg>

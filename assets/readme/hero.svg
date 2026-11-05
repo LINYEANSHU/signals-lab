@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400" viewBox="0 0 1200 400" role="img" aria-labelledby="hero-title hero-desc">
+  <title id="hero-title">Signals &amp; Systems Lab · 信号与系统实验室</title>
+  <desc id="hero-desc">交互式信号与系统实验室：输入一个表达式，在浏览器中实时观察它的时域波形、频谱和 s 平面零极点行为。左侧为项目名与简介，右侧为时域、频域、s 平面三块图版示意。</desc>
+
+  <defs></defs>
+
+  <!-- 背景：板绿场（与应用顶栏同色） -->
+  <rect width="1200" height="400" fill="#1c4a3e"/>
+
+  <!-- 网格母题：极淡的坐标纸纹理 -->
+  <g stroke="#f6f1e3" stroke-opacity="0.05">
+    <line x1="0" y1="100" x2="1200" y2="100"/>
+    <line x1="0" y1="200" x2="1200" y2="200"/>
+    <line x1="0" y1="300" x2="1200" y2="300"/>
+    <line x1="300" y1="0" x2="300" y2="400"/>
+    <line x1="600" y1="0" x2="600" y2="400"/>
+    <line x1="900" y1="0" x2="900" y2="400"/>
+  </g>
+
+  <!-- ============ 左：标题区 ============ -->
+  <g transform="translate(64 62)">
+    <text x="0" y="0" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" fill="#c4b795" letter-spacing="3">INTERACTIVE LAB · 浏览器里的信号与系统工作台</text>
+
+    <text x="0" y="66" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-weight="900" font-size="52" fill="#f6f1e3">Signals &amp; Systems Lab</text>
+    <text x="0" y="112" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-weight="700" font-size="29" fill="#f6f1e3" opacity="0.94">信号与系统实验室 —— 时域 · 频域 · s 平面</text>
+
+    <text x="0" y="160" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="20" fill="#d8d2bf">输入一个表达式，实时观察它的波形、频谱与零极点行为；</text>
+    <text x="0" y="188" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="20" fill="#d8d2bf">无需后端，全部在浏览器本地计算。</text>
+    <text x="0" y="216" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="18" fill="#a89f86">Type an expression and watch its waveform, spectrum and</text>
+    <text x="0" y="240" font-family="'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="18" fill="#a89f86">s-plane come alive — all locally in your browser.</text>
+
+    <text x="0" y="278" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" fill="#c4b795">React 18 · TypeScript · Vite · Plotly · KaTeX · mathjs</text>
+    <text x="0" y="304" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" fill="#c4b795">7 个交互实验 · 9 项内置数学自检 · 中英双语界面</text>
+  </g>
+
+  <!-- ============ 右：奶油纸图版（项目界面母题） ============ -->
+  <g transform="translate(676 40)">
+    <rect width="460" height="320" rx="12" fill="#f6f1e3"/>
+
+    <!-- 图版角标 -->
+    <rect x="24" y="22" width="9" height="9" fill="#d4451f"/>
+    <text x="40" y="31" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" fill="#6b6250" letter-spacing="2">图版 · PLATE</text>
+
+    <!-- 条带 A：时域波形 -->
+    <text x="24" y="62" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#3d382a">x(t) · 时域 time</text>
+    <line x1="24" y1="118" x2="436" y2="118" stroke="#c4b795" stroke-width="1.4"/>
+    <polyline fill="none" stroke="#d4451f" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"
+      points="24,118 32,108 40,92 48,108 56,118 64,128 72,136 80,128 88,118 96,108 104,102 112,108 120,118 128,127 136,131 144,127 152,118 160,110 168,106 176,110 184,118 192,125 200,128 208,125 216,118 224,112 232,109 240,112 248,118 256,123 264,125 272,123 280,118 288,114 296,112 304,114 312,118 320,121 328,122 336,121 344,118 352,116 360,115 368,116 376,118 384,120 392,120 400,120 408,118 416,117 424,118 436,118"/>
+
+    <!-- 条带 B：频谱 -->
+    <text x="24" y="150" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#3d382a">|X(ω)| · 频域 spectrum</text>
+    <line x1="24" y1="210" x2="436" y2="210" stroke="#c4b795" stroke-width="1.4"/>
+    <path d="M24,209 L60,208 L100,206 L130,200 L150,178 L165,152 L175,146 L185,152 L200,178 L220,200 L260,207 L300,206 L320,200 L340,178 L355,152 L365,146 L375,152 L390,178 L410,200 L436,208 L436,210 Z"
+      fill="#0e7490" fill-opacity="0.12" stroke="#0e7490" stroke-width="2"/>
+
+    <!-- 条带 C：s 平面 -->
+    <text x="24" y="238" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#3d382a">s 平面 · 极点× 零点○</text>
+    <rect x="24" y="248" width="226" height="52" fill="#0e7490" fill-opacity="0.08"/>
+    <line x1="250" y1="244" x2="250" y2="304" stroke="#b45309" stroke-width="2.2"/>
+    <!-- 共轭极点对 -->
+    <g stroke="#b91c1c" stroke-width="2.4" stroke-linecap="round">
+      <line x1="195" y1="262" x2="207" y2="274"/>
+      <line x1="207" y1="262" x2="195" y2="274"/>
+      <line x1="195" y1="278" x2="207" y2="290"/>
+      <line x1="207" y1="278" x2="195" y2="290"/>
+    </g>
+    <!-- 零点对 -->
+    <circle cx="330" cy="266" r="5.5" fill="none" stroke="#1d4ed8" stroke-width="2.2"/>
+    <circle cx="330" cy="286" r="5.5" fill="none" stroke="#1d4ed8" stroke-width="2.2"/>
+  </g>
+</svg>
