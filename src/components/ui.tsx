@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { decodeSnapshot, encodeSnapshot } from '../lib/snapshot'
 import { useI18n } from '../i18n'
 
@@ -51,6 +51,7 @@ export function Slider({
       </span>
       <input
         type="range"
+        aria-label={unit ? `${label} (${unit})` : label}
         min={min}
         max={max}
         step={step}
@@ -78,6 +79,7 @@ export function NumberField({
       <span className="num-label">{label}</span>
       <input
         type="number"
+        aria-label={label}
         value={value}
         step={step}
         onChange={(e) => {
@@ -124,7 +126,7 @@ export function SegBtns<T extends string>({
   return (
     <div className="seg">
       {options.map((o) => (
-        <button key={o.value} className={o.value === value ? 'seg-btn active' : 'seg-btn'} onClick={() => onChange(o.value)}>
+        <button key={o.value} aria-pressed={o.value === value} className={o.value === value ? 'seg-btn active' : 'seg-btn'} onClick={() => onChange(o.value)}>
           {o.label}
         </button>
       ))}
@@ -210,6 +212,8 @@ export function SnapshotIO({
   const timerRef = useRef<number>(0)
   const { t } = useI18n()
 
+  useEffect(() => () => window.clearTimeout(timerRef.current), [])
+
   const show = (m: string, t: 'ok' | 'err' = 'ok') => {
     setMsg(m)
     setTone(t)
@@ -279,7 +283,7 @@ export function SnapshotIO({
           e.target.value = ''
         }}
       />
-      {msg ? <span className={`snapshot-msg snapshot-${tone}`}>{msg}</span> : null}
+      <span role="status" className={`snapshot-msg snapshot-${tone}`}>{msg}</span>
     </div>
   )
 }

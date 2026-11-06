@@ -81,7 +81,7 @@ export default function App() {
             <div className="brand-sub">{t('brand.sub')}</div>
           </div>
         </div>
-        <nav className="tabs">
+        <nav className="tabs" aria-label={t('brand.name')}>
           {TABS.map((tabDef, i) => {
             const label = lang === 'zh' ? t(`tabs.${tabDef.key}.zh`) : t(`tabs.${tabDef.key}.en`)
             const sub = lang === 'zh' ? t(`tabs.${tabDef.key}.en`) : t(`tabs.${tabDef.key}.zh`)
@@ -89,6 +89,7 @@ export default function App() {
               <button
                 key={tabDef.id}
                 className={tabDef.id === tab ? 'tab active' : 'tab'}
+                aria-pressed={tabDef.id === tab}
                 onClick={() => select(tabDef.id)}
                 title={t('brand.shortcut', { n: i + 1 })}
               >
@@ -99,7 +100,7 @@ export default function App() {
           })}
         </nav>
         <div className="lang-switch" role="group" aria-label={t('brand.langTitle')}>
-          <span className="lang-globe" aria-hidden="true">🌐</span>
+          <svg className="lang-globe" aria-hidden="true" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18M5 6h14M5 18h14"/></svg>
           <button
             className={lang === 'zh' ? 'lang-btn active' : 'lang-btn'}
             onClick={() => setLang('zh')}
@@ -118,7 +119,7 @@ export default function App() {
           </button>
         </div>
       </header>
-      <div className="lab">
+      <main className="lab" aria-label={t(`tabs.${tab}.${lang}`)}>
         <ErrorBoundary key={tab}>
           {tab === 'fourier' && <FourierLab />}
           {tab === 'laplace' && <LaplaceLab />}
@@ -128,7 +129,7 @@ export default function App() {
           {tab === 'conv' && <ConvolutionLab />}
           {tab === 'sys' && <SystemLab />}
         </ErrorBoundary>
-      </div>
+      </main>
     </div>
   )
 }

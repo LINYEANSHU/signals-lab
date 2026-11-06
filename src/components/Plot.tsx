@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Plotly from 'plotly.js-dist-min'
 import { useI18n } from '../i18n'
+import { C, FONT } from '../lib/plotTheme'
 
 export type PlotProps = {
   data: unknown[]
@@ -31,7 +32,7 @@ function mergeLayout(user: Record<string, unknown> | undefined): Record<string, 
   const base: Record<string, unknown> = {
     paper_bgcolor: 'rgba(0,0,0,0)',
     plot_bgcolor: 'rgba(0,0,0,0)',
-    font: { color: '#c7d2e5', size: 11, family: '"Segoe UI", "Microsoft YaHei", system-ui, sans-serif' },
+    font: { color: C.text, size: 11, family: FONT },
     margin: { l: 52, r: 18, t: 34, b: 40 },
     showlegend: true,
     legend: { orientation: 'h', x: 0.01, y: 1.12, xanchor: 'left', font: { size: 10.5 }, bgcolor: 'rgba(0,0,0,0)' },
@@ -48,6 +49,8 @@ export function Plot({ data, layout, height = 240, onClick, onReady, className, 
   onClickRef.current = onClick
   onReadyRef.current = onReady
   const { t } = useI18n()
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState(false)
 
   useEffect(() => {
     const el = ref.current
@@ -67,7 +70,7 @@ export function Plot({ data, layout, height = 240, onClick, onReady, className, 
     const gdEl = el as unknown as HTMLElement & { _fullLayout?: any }
     let downX = 0
     let downY = 0
-    const onDown = (ev: MouseEvent) => {
+    const onDown = (ev: PointerEvent) => {
       downX = ev.clientX
       downY = ev.clientY
     }
@@ -89,7 +92,7 @@ export function Plot({ data, layout, height = 240, onClick, onReady, className, 
       const dy = ya.range[1] - ((py - ya._offset) / ya._length) * (ya.range[1] - ya.range[0])
       cb({ points: [{ x: dx, y: dy }] })
     }
-    gdEl.addEventListener('mousedown', onDown)
+    gdEl.addEventListener('pointerdown', onDown)
     gdEl.addEventListener('click', domClick)
     // 容器晚于首帧展开时（如 3D 曲面），延迟补一次完整重绘（gl3d 的 scene 需要重新布局）。
     // 仅 3D 轨迹需要该兜底；2D 图由 ResizeObserver 处理尺寸变化，
@@ -113,7 +116,7 @@ export function Plot({ data, layout, height = 240, onClick, onReady, className, 
         }, 180)
       : 0
     return () => {
-      gdEl.removeEventListener('mousedown', onDown)
+      gdEl.removeEventListener('pointerdown', onDown)
       gdEl.removeEventListener('click', domClick)
       window.clearTimeout(t1)
     }
@@ -141,7 +144,7 @@ export function Plot({ data, layout, height = 240, onClick, onReady, className, 
   }, [])
 
   // 导出 PNG：文件名取图表标题（清理非法字符），2 倍分辨率
-  const exportPng = () => {
+  const exportPng = async () => {
     const el = ref.current
     if (!el) return
     let raw = ''
@@ -156,18 +159,23 @@ export function Plot({ data, layout, height = 240, onClick, onReady, className, 
         .replace(/\s+/g, '-')
         .replace(/^-+|-+$/g, '') || 'signals-lab'
     try {
-      void Plotly.downloadImage(el as never, { format: 'png', filename: name, scale: 2 })
+      setExporting(true)
+      setExportError(false)
+      await Plotly.downloadImage(el as never, { format: 'png', filename: name, scale: 2 })
     } catch {
-      /* 导出失败静默忽略 */
+      setExportError(true)
+    } finally {
+      setExporting(false)
     }
   }
 
   return (
     <div className="plot-wrap" style={{ width: '100%', height, ...style }}>
       <div ref={ref} style={{ width: '100%', height: '100%' }} className={className} />
-      <button type="button" className="plot-export" title={t('ui.exportPng')} onClick={exportPng}>
-        ⤓ PNG
+      <button type="button" className="plot-export" title={t('ui.exportPng')} aria-label={t('ui.exportPng')} disabled={exporting} onClick={() => void exportPng()}>
+        <svg aria-hidden="true" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M8 1v9m-3-3 3 3 3-3M2 11v3h12v-3" /></svg> PNG
       </button>
+      {exportError && <span className="plot-export-error" role="alert">{t('ui.exportPngFail')}</span>}
     </div>
   )
 }

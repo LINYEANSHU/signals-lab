@@ -1,108 +1,82 @@
-<div align="center">
-
-[简体中文](README.md) | **English**
-
-[![CI](https://github.com/LINYEANSHU/signals-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/LINYEANSHU/signals-lab/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-
-<img src="./assets/readme/hero.svg" width="100%" alt="Signals &amp; Systems Lab — type an expression and watch its time-domain waveform, spectrum and s-plane behavior come alive in an interactive laboratory" />
-
-</div>
+[简体中文](README.md) · **English**
 
 # Signals & Systems Lab
 
-An interactive workbench for the classic **continuous and discrete-time signals and systems** course. Type any supported mathematical expression and watch, in real time, how signals and systems behave across the time domain, the frequency domain, and the complex plane — how convolution flips and slides, why spectra leak, and how a pole becomes a "mountain" on the Laplace surface.
+Turn expressions into interactive time-domain, frequency-domain and s/z-plane experiments. Change a parameter, inspect the result, then export a chart or share a configuration.
 
-Everything runs locally in the browser. No backend, no sign-up. **User expressions are parsed with mathjs's restricted expression language — arbitrary JavaScript is never executed.**
+<img src="assets/readme/hero.svg" width="100%" alt="Signals & Systems Lab">
 
-<div align="center">
-<img src="./assets/readme/modules.svg" width="100%" alt="Seven experiment views: Fourier Transform, Laplace 3D, FT Integral Demo, Sampling &amp; Aliasing, Properties, Convolution, Systems &amp; Pole-Zero" />
-</div>
+[![CI](https://github.com/LINYEANSHU/signals-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/LINYEANSHU/signals-lab/actions/workflows/ci.yml)
+[![MIT](https://img.shields.io/badge/license-MIT-54775a.svg)](LICENSE)
 
-## The seven experiments
+## In the app
 
-| # | Experiment | What you can do |
-|---|-----------|-----------------|
-| 01 | **Fourier Transform** | Switch between CTFT and DTFT; magnitude, phase (with unwrapping), real and imaginary parts; rad/s ↔ Hz units; a **live Parseval energy consistency check**; automatic truncation-leakage warnings |
-| 02 | **Laplace 3D** | The \|X(s)\| surface in 3D: poles as peaks, zeros as valleys (analytic X(s) or a row-by-row numeric scan over σ); the **amber jω section is the Fourier transform**; a movable σ₀ section shows what happens when the slice leaves the axis; automatic ROC-vs-axis verdict |
-| 03 | **FT Integral Demo** | A point-by-point animation of X(ω₀)=∫x(t)e^{−jω₀t}dt: signal × counter-rotating exponential → real/imaginary products → **a spiral of the accumulated integral in the complex plane** → the moving value on the spectrum; comparison frequency ω₁, jump-to-peak, scrubbable progress |
-| 04 | **Sampling & Aliasing** | Sample a continuous signal at fs and watch the spectrum replicate periodically; B₉₉ energy bandwidth is compared against fs/2 to flag undersampling; ideal sinc-interpolation reconstruction with an error readout; **live folding frequencies for every component** |
-| 05 | **Properties** | Time shift (magnitude unchanged, phase tilted), frequency shift (AM-style spectral move), scaling (a **numerical verification of the time–bandwidth invariant**), the convolution theorem (\|Y\|=\|X·H\| overlapping point by point), and differentiation (jωX); theory curves drawn directly against numeric results |
-| 06 | **Convolution** | The flip–slide–multiply–sum animation for CT and DT, where **the pink overlap area is the current y(t)**; a frequency-domain \|X\|·\|H\|=\|Y\| check; a library of classic convolution pairs |
-| 07 | **Systems & Pole-Zero** | Biquad coefficient editing for H(s)/H(z) plus a system library; an s/z-plane pole-zero plot with **ROC shading and a stability verdict**; **click the plot to drop in a conjugate pole pair**; magnitude/phase response (linear/dB); a 3D \|H(s)\| surface; time-domain simulation (state-space RK4 for CT, exact recursion for DT) |
+<img src="assets/readme/current-desktop.png" width="100%" alt="Signals & Systems Lab — desktop interface">
 
-Every experiment ships with **presets** (each with a one-line explanation), **config snapshots** (import/export as JSON — share a starting state with students or assignments), **PNG chart export**, and **keys 1–7 to jump between experiments**.
+<details>
+<summary>Show the mobile layout</summary>
 
-## Quick start
+<img src="assets/readme/current-mobile.png" width="390" alt="Signals & Systems Lab — mobile interface">
 
-```bash
-git clone https://github.com/LINYEANSHU/signals-lab.git
-cd signals-lab
-npm install
-npm run dev        # dev server → http://localhost:5173
-npm run build      # production build → dist/
-npm run preview    # preview the production build
+</details>
+
+## Start
+
+Use Node.js 18+; CI runs on Node 22.
+
+```sh
+npm ci
+npm run dev
 ```
 
-Requires Node 18+ (CI runs on Node 22). On `npm run dev`, **9 built-in math self-checks** run automatically in the browser console.
+Open the terminal URL, normally `http://localhost:5173`. After dependencies are installed, the app runs locally in your browser without a backend or account.
 
-The UI follows your browser language by default and can be switched anytime with **🌐 中 / EN** in the top bar (the choice is stored in localStorage).
+Start in Fourier with a preset or `exp(-t*t)`, adjust the observation window, and compare waveform and spectrum. Switch Chinese/English in the header; keys `1`–`7` select modules.
 
-## Teaching scenarios
+## Seven ways to inspect a signal
 
-- **Lecture demos** — presets follow a teaching arc (damped oscillation → rectangle → Gaussian …), each with a one-line takeaway; keys 1–7 hop between concepts without losing the room.
-- **Take-home exploration** — export the current state as a JSON snapshot and hand it to students; they import it and immediately test "what if τ doubles?" from the same starting point.
-- **Concept rescue** — the Laplace 3D view turns "why does multiplying by e^{−σt} make it converge?" into a mountain you can orbit; the convolution animation makes flip–slide–sum visible as accumulating area.
+| Module | What to explore |
+|---|---|
+| Fourier | CTFT/DTFT, magnitude/phase, energy checks and truncation |
+| Laplace 3D | Complex-frequency surfaces, movable slices, ROC and the imaginary axis |
+| Transform mechanism | Signal products, complex-plane accumulation and spectral values |
+| Sampling and aliasing | Sampling rate, repeated spectra and sinc reconstruction |
+| Signal properties | Shifts, scaling, differentiation and the convolution theorem |
+| Convolution | Flip, slide, multiply and accumulate in CT/DT |
+| Systems and poles/zeros | Transfer functions, pole placement, frequency and time response |
 
-## Expression syntax (restricted)
+Modules include presets and JSON configuration snapshots; charts export to PNG. Expressions use a restricted mathjs language with `u`, `rect`, `tri`, `sinc`, complex values and adjustable parameters.
 
-- **Functions**: `u( )` step, `rect( )`, `tri( )`, `sinc( )` (normalized sin πt/πt), `sa( )` (sin t/t), `sgn( )`; the discrete domain adds `delta(n)` = δ[n]
-- **Operators**: `exp sin cos tan sqrt abs log pow ^`, implicit multiplication (`2t`, `e^(-2t)`), complex unit `j` or `i`
-- **Constants**: `pi`, `e`; **parameters**: `a b f0 w0 tau t0 L` (live sliders on the left; only the ones your expression uses are shown)
+## Interaction
 
-## How it's organized
+- Charts fit narrow screens; module navigation scrolls horizontally.
+- Toggles support keyboard focus and Space; sliders and number fields have accessible names.
+- PNG export shows pending and recoverable error states. Its action is visible without hover.
+- Plotly draws the charts, KaTeX sets formulas, and calculations/configurations remain local.
 
+## Build and verify
+
+```sh
+npm run build
+npm run preview
 ```
-src/
-├── lib/          Numeric core (UI-free, independently testable)
-│   ├── parser.ts     mathjs restricted expression compiler → sampler
-│   ├── numeric.ts    NDFT (trapezoidal rule + recurrence), convolution, root finding, cumulative integral
-│   ├── systems.ts    Transfer function → poles/zeros / frequency response / state space, RK4 & recursion
-│   ├── sampling.ts   Sample grids, sinc interpolation, alias folding, energy bandwidth
-│   ├── presets.ts    Bilingual preset library (signals / systems / convolution pairs)
-│   ├── devtests.ts   9 math self-checks (rect→sinc zeros, Parseval, convolution peak, flat δ[n] spectrum, …)
-│   └── snapshot.ts   Config snapshot validation
-├── i18n.tsx      Lightweight bilingual dictionary (Context + localStorage; types guarantee zh/en key parity)
-├── components/   LabLayout / Plot (Plotly wrapper) / KaTeX formulas / shared controls
-└── views/        The 7 experiment views
-```
 
-## Mathematical correctness
+Build runs TypeScript checks first. Development mode runs nine math self-checks, available in the console and `window.__devtestResults`. Recent checks cover all seven modules at desktop/phone widths, keyboard toggles, invalid-expression recovery and PNG download.
 
-- CTFT uses trapezoidal integration over the observation window (NDFT) with a twiddle-factor recurrence in the inner loop — roughly an order of magnitude faster than the naive form
-- The Parseval identity ∫|x|²dt = (1/2π)∫|X|²dω is displayed live as a built-in consistency check
-- Polynomial roots: closed form up to degree 2, Durand–Kerner iteration beyond; conjugate-pair noise is cleaned for real coefficients
-- Continuous simulation: controllable-canonical state space + RK4; the impulse response is computed exactly as h(t)=C·e^{At}B (zero input, initial state B) rather than approximating δ numerically
-- Discrete systems: exact difference-equation recursion; the DTFT of a finite sequence is an exact sum
-- The 9 math self-checks run automatically on `npm run dev` (results are also written to `window.__devtestResults`)
+3D surfaces need WebGL. Recent browser verification used CPU SwiftShader without hardware GPU acceleration; this does not mean every browser defaults to a CPU backend.
 
-## Known limits
+## Numerical limits
 
-- The CTFT is a finite-window numerical approximation: if the signal has not decayed inside the window, truncation leakage appears (the UI warns you). This is inherent to numerical Fourier transforms, not a bug
-- Continuous systems are limited to proper second-order transfer functions (b₂ must be 0 when a₂=0); unstable discrete simulations are magnitude-clamped
+CTFT uses a finite observation window and numerical approximation; signals that do not decay can produce truncation leakage. Continuous-time simulation supports first- and second-order models with a direct term. Discrete responses have an amplitude cap; continuous responses only have a bounded time window, so extreme unstable parameters can still overflow numerically. Visualizations support teaching and exploration, not a proof for every possible system.
 
-## References & acknowledgements
+Plotly and numerical dependencies make the production bundle substantial; first-load cost depends on deployment and device.
 
-The course arc follows the classic treatment in *Signals and Systems* (A. V. Oppenheim, A. S. Willsky); the organization across the three domains — time, frequency, and the s/z-plane — draws on the demo experiments commonly used in signals and systems courses.
+## Technology and license
 
-With thanks to the open-source stack behind it:
+React, TypeScript and Vite with Plotly.js, mathjs and KaTeX. Dependencies retain their licenses. The module sequence draws on the time-, frequency- and complex-frequency connections in Oppenheim and Willsky's *Signals and Systems*.
 
-- [React](https://react.dev) — component views and concurrent rendering (heavy recomputation degrades gracefully while sliders are dragged)
-- [Plotly.js](https://plotly.com/javascript/) — every chart interaction (zoom, drag, hover readouts, 3D surfaces)
-- [KaTeX](https://katex.org) — formula typesetting
-- [mathjs](https://mathjs.org) — restricted expression parsing (no eval)
-- [Vite](https://vite.dev) — dev server and build
+Project code: [MIT](LICENSE).
 
-## License
+## Contributors
 
-[MIT](LICENSE) © 2026 LINYEANSHU
+- [LINYEANSHU](https://github.com/LINYEANSHU)
