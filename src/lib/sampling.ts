@@ -90,7 +90,7 @@ export function energyBandwidth(
     const lo = Math.max(0, Math.floor(mid) - k)
     const hi = Math.min(M - 1, Math.ceil(mid) + k)
     const e = acc[hi] - (lo > 0 ? acc[lo - 1] : 0)
-    if (e >= ratio * total) return Math.abs(omegas[k])
+    if (e >= ratio * total) return Math.abs(omegas[hi])
   }
   return Math.abs(omegas[M - 1])
 }

@@ -24,7 +24,7 @@ export function dtZeros(s: DTSystem): Cx[] {
   const [b0, b1, b2] = s.b
   if (b0 === 0 && b1 === 0 && b2 === 0) return []
   // 分子 b0 z² + b1 z + b2（z 正幂，最高次在前）
-  return polyRoots([cx(b2), cx(b1), cx(b0)])
+  return polyRoots([cx(b0), cx(b1), cx(b2)])
 }
 
 export function ctNumDenCx(s: CTSystem): { num: Cx[]; den: Cx[] } {

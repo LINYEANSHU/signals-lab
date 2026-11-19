@@ -232,9 +232,9 @@ export function unwrap(ph: Float64Array): Float64Array {
   let off = 0
   const TAU = 2 * Math.PI
   for (let i = 1; i < n; i++) {
-    const d = ph[i] + off - out[i - 1]
-    if (d > Math.PI) off -= TAU
-    else if (d < -Math.PI) off += TAU
+    let d = ph[i] + off - out[i - 1]
+    while (d > Math.PI) { off -= TAU; d -= TAU }
+    while (d < -Math.PI) { off += TAU; d += TAU }
     out[i] = ph[i] + off
   }
   return out
@@ -351,8 +351,9 @@ export function freqResponseCT(num: Cx[], den: Cx[], w: number): Cx {
   const d = polyEval(den, cx(0, w))
   const d2 = d.re * d.re + d.im * d.im
   if (d2 < 1e-12) {
-    const s = 1e-6 * Math.sign(n.re || 1)
-    return cx((n.re * 1e6) * (d2 > 0 ? 1 : s) || 0, 0)
+    const mag = Math.hypot(n.re, n.im)
+    if (mag < 1e-12) return cx(0, 0)
+    return cx((n.re / mag) * 1e6, (n.im / mag) * 1e6)
   }
   return cDiv(n, d)
 }
