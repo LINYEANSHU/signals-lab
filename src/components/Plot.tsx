@@ -41,9 +41,25 @@ function mergeLayout(user: Record<string, unknown> | undefined): Record<string, 
   return user ? deepMerge(base, user) : base
 }
 
+type PlotSurface = {
+  node: HTMLDivElement
+  generation: number
+  active: boolean
+  pending: Set<Promise<unknown>>
+}
+
+function runPlotOperation<T>(surface: PlotSurface, action: () => T | PromiseLike<T>): Promise<T> {
+  const job = new Promise<T>(resolve => resolve(action()))
+  surface.pending.add(job)
+  const settled = () => { surface.pending.delete(job) }
+  void job.then(settled, settled)
+  return job
+}
+
 /** Plotly 图表封装：data/layout 变化时调用 Plotly.react；支持点击事件与自适应尺寸 */
 export function Plot({ data, layout, height = 240, onClick, onReady, className, style }: PlotProps) {
   const ref = useRef<HTMLDivElement | null>(null)
+  const surfaceRef = useRef<PlotSurface | null>(null)
   const onClickRef = useRef(onClick)
   const onReadyRef = useRef(onReady)
   onClickRef.current = onClick
@@ -55,15 +71,50 @@ export function Plot({ data, layout, height = 240, onClick, onReady, className, 
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    const merged = mergeLayout(layout)
-    Plotly.react(el, data as never, merged as never, {
-      displayModeBar: false,
-      responsive: true,
-      scrollZoom: true,
-      doubleClick: 'reset',
-    }).then(() => {
-      onReadyRef.current?.(el)
+    const previous = surfaceRef.current
+    const surface = previous?.node === el ? previous : { node: el, generation: 0, active: false, pending: new Set<Promise<unknown>>() }
+    surfaceRef.current = surface
+    surface.active = true
+    const generation = ++surface.generation
+    const ro = new ResizeObserver(() => {
+      if (surface.active) void runPlotOperation(surface, () => Plotly.Plots.resize(el as never)).catch(() => {})
     })
+    ro.observe(el)
+    return () => {
+      ro.disconnect()
+      surface.active = false
+      // Plotly finishes updates by emitting an event on the graph. Keep its
+      // emitter alive until the in-flight operations have settled.
+      void Promise.allSettled(surface.pending).then(() => {
+        if (surface.generation !== generation) return
+        if (surfaceRef.current === surface) surfaceRef.current = null
+        try {
+          Plotly.purge(el as never)
+        } catch {
+          /* The graph may not have initialized successfully. */
+        }
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+    const surface = surfaceRef.current
+    if (!surface) return
+    const el = surface.node
+    const merged = mergeLayout(layout)
+    let active = true
+    const render = (notify: boolean) => {
+      if (!active || !surface.active) return
+      void runPlotOperation(surface, () => Plotly.react(el, data as never, merged as never, {
+        displayModeBar: false,
+        responsive: false, // ResizeObserver owns resize so teardown can await it.
+        scrollZoom: true,
+        doubleClick: 'reset',
+      })).then(() => {
+        if (notify && active && surface.active) onReadyRef.current?.(el)
+      }).catch(() => {})
+    }
+    render(true)
     // 始终绑定点击（回调经 ref 转发，placePoles 等开关变化无需重新绑定）。
     // plotly_click 只在命中数据点时触发；这里用 DOM click + 坐标反算，
     // 使"点击空白处放置极点"等交互在任意位置可用。
@@ -101,52 +152,19 @@ export function Plot({ data, layout, height = 240, onClick, onReady, className, 
       (t) => t && typeof t === 'object' && typeof (t as { type?: unknown }).type === 'string' &&
         ((t as { type: string }).type === 'surface' || (t as { type: string }).type.endsWith('3d')),
     )
-    const t1 = is3d
-      ? window.setTimeout(() => {
-          try {
-            Plotly.react(el, data as never, merged as never, {
-              displayModeBar: false,
-              responsive: true,
-              scrollZoom: true,
-              doubleClick: 'reset',
-            })
-          } catch {
-            /* ignore */
-          }
-        }, 180)
-      : 0
+    const t1 = is3d ? window.setTimeout(() => render(false), 180) : 0
     return () => {
+      active = false
       gdEl.removeEventListener('pointerdown', onDown)
       gdEl.removeEventListener('click', domClick)
       window.clearTimeout(t1)
     }
   }, [data, layout, height])
 
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const ro = new ResizeObserver(() => {
-      try {
-        Plotly.Plots.resize(el as never)
-      } catch {
-        /* ignore */
-      }
-    })
-    ro.observe(el)
-    return () => {
-      ro.disconnect()
-      try {
-        Plotly.purge(el as never)
-      } catch {
-        /* ignore */
-      }
-    }
-  }, [])
-
   // 导出 PNG：文件名取图表标题（清理非法字符），2 倍分辨率
   const exportPng = async () => {
-    const el = ref.current
-    if (!el) return
+    const surface = surfaceRef.current
+    if (!surface?.active) return
     let raw = ''
     const t = layout?.title
     if (typeof t === 'string') raw = t
@@ -161,11 +179,11 @@ export function Plot({ data, layout, height = 240, onClick, onReady, className, 
     try {
       setExporting(true)
       setExportError(false)
-      await Plotly.downloadImage(el as never, { format: 'png', filename: name, scale: 2 })
+      await runPlotOperation(surface, () => Plotly.downloadImage(surface.node as never, { format: 'png', filename: name, scale: 2 }))
     } catch {
-      setExportError(true)
+      if (surface.active) setExportError(true)
     } finally {
-      setExporting(false)
+      if (surface.active) setExporting(false)
     }
   }
 
