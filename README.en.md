@@ -9,18 +9,24 @@ Turn expressions into interactive time-domain, frequency-domain and s/z-plane ex
 [![CI](https://github.com/LINYEANSHU/signals-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/LINYEANSHU/signals-lab/actions/workflows/ci.yml)
 [![MIT](https://img.shields.io/badge/license-MIT-54775a.svg)](LICENSE)
 
-## In the app
+## Windows desktop app
 
-<img src="assets/readme/current-desktop.png" width="100%" alt="Signals & Systems Lab — desktop interface">
+**[Download for Windows x64 (portable ZIP)](https://github.com/LINYEANSHU/signals-lab/releases/download/windows-v1.0.0/signals-lab-windows-x64.zip)**
+
+Extract the entire ZIP, then double-click `Signals Lab.exe` inside the app folder. All seven experiments run offline. Try Laplace 3D and move the slice-position slider to see how the slice changes across the surface.
+
+<img src="assets/readme/windows-desktop.webp" width="100%" alt="Signals Lab for Windows showing the Laplace surface, a pole, and slice controls">
 
 <details>
-<summary>Show the mobile layout</summary>
+<summary>Show the desktop and mobile browser layouts</summary>
 
-<img src="assets/readme/current-mobile.png" width="390" alt="Signals & Systems Lab — mobile interface">
+<img src="assets/readme/current-desktop.png" width="100%" alt="Signals &amp; Systems Lab in a desktop browser">
+
+<img src="assets/readme/current-mobile.png" width="390" alt="Signals &amp; Systems Lab in a mobile browser">
 
 </details>
 
-## Start
+## Run in your browser
 
 Use Node.js 18+; CI runs on Node 22.
 
@@ -62,6 +68,8 @@ npm run preview
 ```
 
 Build runs TypeScript checks first. Development mode runs nine math self-checks, available in the console and `window.__devtestResults`. Recent checks cover all seven modules at desktop/phone widths, keyboard toggles, invalid-expression recovery and PNG download.
+
+To package the desktop app, run [`node desktop/build.cjs`](desktop/build.cjs) from the repository root on Windows x64 with Node.js 24. Output goes to `desktop/dist/`.
 
 3D surfaces need WebGL. Recent browser verification used CPU SwiftShader without hardware GPU acceleration; this does not mean every browser defaults to a CPU backend.
 

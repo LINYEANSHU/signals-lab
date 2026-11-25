@@ -1,0 +1,8 @@
+{
+  "id": "signals-lab",
+  "name": "Signals Lab 信号与系统实验室",
+  "exe": "Signals Lab",
+  "vite": true,
+  "background": "#111820",
+  "webgl": true
+}

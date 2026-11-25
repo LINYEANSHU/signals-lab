@@ -9,18 +9,24 @@
 [![CI](https://github.com/LINYEANSHU/signals-lab/actions/workflows/ci.yml/badge.svg)](https://github.com/LINYEANSHU/signals-lab/actions/workflows/ci.yml)
 [![MIT](https://img.shields.io/badge/license-MIT-54775a.svg)](LICENSE)
 
-## 实际界面
+## Windows 桌面版
 
-<img src="assets/readme/current-desktop.png" width="100%" alt="信号与系统交互实验室 — desktop interface">
+**[下载 Windows x64 便携版（ZIP）](https://github.com/LINYEANSHU/signals-lab/releases/download/windows-v1.0.0/signals-lab-windows-x64.zip)**
+
+完整解压 ZIP，再双击应用文件夹中的 `Signals Lab.exe`。七个实验均可离线使用。打开「拉普拉斯 3D」，拖动切面位置滑块，观察切面与曲面如何联动。
+
+<img src="assets/readme/windows-desktop.webp" width="100%" alt="信号与系统交互实验室 Windows 桌面版的拉普拉斯曲面、极点和切面控件">
 
 <details>
-<summary>展开手机界面</summary>
+<summary>展开浏览器的桌面和手机界面</summary>
 
-<img src="assets/readme/current-mobile.png" width="390" alt="信号与系统交互实验室 — mobile interface">
+<img src="assets/readme/current-desktop.png" width="100%" alt="信号与系统交互实验室的桌面浏览器界面">
+
+<img src="assets/readme/current-mobile.png" width="390" alt="信号与系统交互实验室的手机浏览器界面">
 
 </details>
 
-## 快速开始
+## 浏览器版
 
 需要 Node.js 18+；CI 使用 Node 22。
 
@@ -62,6 +68,8 @@ npm run preview
 ```
 
 构建会先执行 TypeScript 检查。开发模式自动运行 9 项数学自检，结果见浏览器控制台与 `window.__devtestResults`。本轮检查覆盖七模块的桌面/手机布局、键盘开关、无效表达式恢复和 PNG 下载。
+
+在 Windows x64 上使用 Node.js 24，从仓库根目录运行 [`node desktop/build.cjs`](desktop/build.cjs) 可重新打包桌面版，产物位于 `desktop/dist/`。
 
 普通图表在浏览器中绘制；3D 曲面需要 WebGL。最近浏览器验证使用 CPU SwiftShader，没有用硬件 GPU，这不表示所有浏览器默认都采用 CPU 后端。
 

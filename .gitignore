@@ -10,6 +10,14 @@ dist/
 
 # local-only reports
 OPTIMIZATION-REPORT.md
+/REVIEW-2026-11-06.md
+/review-evidence/
+
+# Windows desktop build and smoke-test output
+/desktop/.cache/
+/desktop/dist/
+/desktop/qa/
+/desktop/node_modules/
 
 # internal design-process artifacts (not part of the open-source release)
 .impeccable/
