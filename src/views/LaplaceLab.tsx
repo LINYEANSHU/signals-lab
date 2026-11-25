@@ -18,6 +18,20 @@ const NSAMP = 1536 // 时域采样
 const CLAMP = 1e4
 const lg = (m: number) => Math.log10(1 + Math.min(m, CLAMP))
 
+// 观察范围：自动包含极点/零点
+function gridRange(preset: LaplacePreset, params: Params) {
+  let sr = 2.5
+  let wr = 8
+  for (const p of preset.poles?.(params) ?? []) {
+    sr = Math.max(sr, Math.abs(p.re) + 0.9)
+    wr = Math.max(wr, Math.abs(p.im) + 3)
+  }
+  for (const z of preset.zeros?.(params) ?? []) {
+    wr = Math.max(wr, Math.abs(z.im) + 3)
+  }
+  return { sigR: Math.min(sr, 5), wR: Math.min(wr, 26) }
+}
+
 export default function LaplaceLab() {
   const { lang, t } = useI18n()
   const [presetId, setPresetId] = useState(LAPLACE_SIGNALS[0].id)
@@ -49,19 +63,7 @@ export default function LaplaceLab() {
     return sampleCT(smp, preset.win[0], preset.win[1], NSAMP)
   }, [compiled, params, preset])
 
-  // 观察范围：自动包含极点/零点
-  const range = useMemo(() => {
-    let sr = 2.5
-    let wr = 8
-    for (const p of preset.poles?.(params) ?? []) {
-      sr = Math.max(sr, Math.abs(p.re) + 0.9)
-      wr = Math.max(wr, Math.abs(p.im) + 3)
-    }
-    for (const z of preset.zeros?.(params) ?? []) {
-      wr = Math.max(wr, Math.abs(z.im) + 3)
-    }
-    return { sigR: Math.min(sr, 5), wR: Math.min(wr, 26) }
-  }, [preset, params])
+  const range = useMemo(() => gridRange(preset, params), [preset, params])
 
   const useAnalytic = mode === 'auto' && !!preset.xs
   const xsFn = useMemo(() => (useAnalytic ? preset.xs!(params) : null), [useAnalytic, preset, params])
@@ -349,12 +351,15 @@ export default function LaplaceLab() {
   const snapshotApply = (d: Record<string, unknown>) => {
     const pid = str(d, 'presetId', LAPLACE_SIGNALS[0].id)
     const restoredPreset = LAPLACE_SIGNALS.find((p) => p.id === pid) ?? LAPLACE_SIGNALS[0]
+    const restoredParams = numRecord(d, 'params', PARAM_KEYS, { ...DEFAULT_PARAMS, ...restoredPreset.params }) as Params
+    const { sigR } = gridRange(restoredPreset, restoredParams)
+    const restoredSigma = num(d, 'sigma0', Math.max(-sigR, Math.min(sigR, sigma0)), -sigR, sigR)
     setPresetId(restoredPreset.id)
     // 等 [presetId] 的预设副作用先跑完，再覆盖为导入值
     deferApply(() => {
       setExpr(str(d, 'expr', restoredPreset.expr))
-      setParams(numRecord(d, 'params', PARAM_KEYS, { ...DEFAULT_PARAMS, ...restoredPreset.params }) as Params)
-      setSigma0(num(d, 'sigma0', sigma0, -range.sigR, range.sigR))
+      setParams(restoredParams)
+      setSigma0(restoredSigma)
       setShowPlane(bool(d, 'showPlane', showPlane))
       setShowPZ(bool(d, 'showPZ', showPZ))
       setMode(str(d, 'mode', mode, ['auto', 'numeric']) as 'auto' | 'numeric')
