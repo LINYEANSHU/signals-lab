@@ -348,12 +348,12 @@ export default function LaplaceLab() {
   })
   const snapshotApply = (d: Record<string, unknown>) => {
     const pid = str(d, 'presetId', LAPLACE_SIGNALS[0].id)
-    setPresetId(LAPLACE_SIGNALS.some((p) => p.id === pid) ? pid : LAPLACE_SIGNALS[0].id)
+    const restoredPreset = LAPLACE_SIGNALS.find((p) => p.id === pid) ?? LAPLACE_SIGNALS[0]
+    setPresetId(restoredPreset.id)
     // 等 [presetId] 的预设副作用先跑完，再覆盖为导入值
     deferApply(() => {
-      const e = str(d, 'expr', '')
-      if (e) setExpr(e)
-      setParams(numRecord(d, 'params', PARAM_KEYS, DEFAULT_PARAMS) as Params)
+      setExpr(str(d, 'expr', restoredPreset.expr))
+      setParams(numRecord(d, 'params', PARAM_KEYS, { ...DEFAULT_PARAMS, ...restoredPreset.params }) as Params)
       setSigma0(num(d, 'sigma0', sigma0, -range.sigR, range.sigR))
       setShowPlane(bool(d, 'showPlane', showPlane))
       setShowPZ(bool(d, 'showPZ', showPZ))

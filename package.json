@@ -5,6 +5,7 @@
   "type": "module",
   "description": "交互式连续与离散时间信号与系统可视化实验室",
   "scripts": {
+    "test": "node --experimental-strip-types --test",
     "dev": "vite",
     "build": "tsc --noEmit -p tsconfig.json && vite build",
     "preview": "vite preview"

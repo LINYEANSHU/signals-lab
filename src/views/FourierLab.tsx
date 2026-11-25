@@ -305,13 +305,13 @@ export default function FourierLab() {
     const dom = str(d, 'domain', domain, ['ct', 'dt']) as Domain
     const list = dom === 'ct' ? CT_SIGNALS : DT_SIGNALS
     const pid = str(d, 'presetId', list[0].id)
+    const restoredPreset = list.find((p) => p.id === pid) ?? list[0]
     setDomain(dom)
-    setPresetId(list.some((p) => p.id === pid) ? pid : list[0].id)
+    setPresetId(restoredPreset.id)
     // 等 [presetId, domain] 的预设副作用先跑完，再覆盖为导入值
     deferApply(() => {
-      const e = str(d, 'expr', '')
-      if (e) setExpr(e)
-      setParams(numRecord(d, 'params', PARAM_KEYS, DEFAULT_PARAMS) as Params)
+      setExpr(str(d, 'expr', restoredPreset.expr))
+      setParams(numRecord(d, 'params', PARAM_KEYS, { ...DEFAULT_PARAMS, ...restoredPreset.params }) as Params)
       setWin(numArray2(d, 'win', win))
       setNwin(numArray2(d, 'nwin', nwin))
       setQuality(Math.round(num(d, 'quality', quality, 0, QUALITY_N.length - 1)))

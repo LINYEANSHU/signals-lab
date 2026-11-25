@@ -2,10 +2,36 @@
 // 设计原则：导入是"尽力而为"——逐字段校验类型与范围，非法字段回退到当前值，绝不抛出。
 
 export const SNAPSHOT_VERSION = 1
+const CHECKPOINT_PREFIX = 'signalsLab.checkpoint.v1.'
+
+type CheckpointStorage = Pick<Storage, 'getItem' | 'setItem'>
+type CheckpointResult =
+  | { status: 'ready'; data: Record<string, unknown> }
+  | { status: 'missing' | 'invalid' | 'unavailable' }
+
+export function writeCheckpoint(view: string, data: Record<string, unknown>, storage?: CheckpointStorage): boolean {
+  try {
+    (storage ?? window.localStorage).setItem(CHECKPOINT_PREFIX + view, encodeSnapshot(view, data))
+    return true
+  } catch {
+    return false
+  }
+}
+
+export function readCheckpoint(view: string, storage?: CheckpointStorage): CheckpointResult {
+  try {
+    const text = (storage ?? window.localStorage).getItem(CHECKPOINT_PREFIX + view)
+    if (text === null) return { status: 'missing' }
+    const data = decodeSnapshot(text, view)
+    return data ? { status: 'ready', data } : { status: 'invalid' }
+  } catch {
+    return { status: 'unavailable' }
+  }
+}
 
 /** 编码为 JSON 文本（带版本号与视图标识） */
 export function encodeSnapshot(view: string, data: Record<string, unknown>): string {
-  return JSON.stringify({ v: SNAPSHOT_VERSION, view, ...data }, null, 2)
+  return JSON.stringify({ ...data, v: SNAPSHOT_VERSION, view }, null, 2)
 }
 
 /** 解码并校验快照；版本或视图不匹配、JSON 非法时返回 null */

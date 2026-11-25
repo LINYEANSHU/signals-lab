@@ -2,23 +2,25 @@
 // 连续信号以 fs 采样 → 频谱周期重复（混叠=重叠）→ 理想 sinc 插值重建对比
 import { useMemo, useState } from 'react'
 import { Plot } from '../components/Plot'
-import { Badge, Panel, Select, Slider, SnapshotIO, TextInput, Toggle, Note } from '../components/ui'
+import { Badge, Btn, Field, Panel, Select, Slider, SnapshotIO, TextInput, Toggle, Note } from '../components/ui'
 import { ExpSection, Explanation, Tex } from '../components/Tex'
 import { LabLayout } from '../components/LabLayout'
 import { useI18n, pickLabel, pickNote, listSep } from '../i18n'
 import { compileSignal, makeSampler, usedParams, DEFAULT_PARAMS, PARAM_KEYS, type Params } from '../lib/parser'
 import { sampleCT, ndft, linspace, maxAbs } from '../lib/numeric'
-import { sampleGrid, sincInterp, aliasFreq, energyBandwidth } from '../lib/sampling'
+import { sampleGrid, sincInterp, aliasFreq, energyBandwidth, SAMPLE_CHALLENGE, samplingChallenge } from '../lib/sampling'
 import { SAMPLING_SIGNALS, type SignalPreset } from '../lib/presets'
-import { bool, deferApply, num, numRecord, str } from '../lib/snapshot'
+import { bool, num, numRecord, str } from '../lib/snapshot'
 import { C, axis, baseLayout } from '../lib/plotTheme'
 
 const N_DENSE = 2401 // "连续"参考曲线采样数
 const TAU = 2 * Math.PI
+const DEFAULT_WIN: [number, number] = [-1, 2]
 
 type SamplingPreset = SignalPreset & { /** 主频率（用于混叠读数，可选） */ aliasOf?: 'f0' | 'b' }
 
 const PRESETS = SAMPLING_SIGNALS as SamplingPreset[]
+const CHALLENGE_PRESET = PRESETS.find((p) => p.id === 'two-tone')!
 
 export default function SamplingLab() {
   const { lang, t } = useI18n()
@@ -28,6 +30,8 @@ export default function SamplingLab() {
   const [params, setParams] = useState<Params>({ ...DEFAULT_PARAMS, ...preset.params })
   const [fs, setFs] = useState(12)
   const [showRecon, setShowRecon] = useState(true)
+  const [challenge, setChallenge] = useState(false)
+  const [prediction, setPrediction] = useState(0)
 
   // 预设切换：表达式与参数跟随预设（混叠读数按主频率 f0/b 计算）
   const applyPreset = (p: SamplingPreset) => {
@@ -39,10 +43,17 @@ export default function SamplingLab() {
     const p = PRESETS.find((q) => q.id === id) ?? PRESETS[0]
     applyPreset(p)
   }
+  const startChallenge = () => {
+    pickPreset(CHALLENGE_PRESET.id)
+    setParams({ ...DEFAULT_PARAMS, f0: SAMPLE_CHALLENGE.lowTone, b: SAMPLE_CHALLENGE.highTone })
+    setFs(SAMPLE_CHALLENGE.startRate)
+    setPrediction(0)
+    setChallenge(true)
+  }
 
   const compiled = useMemo(() => compileSignal(expr), [expr])
   const symbols = compiled.ok ? usedParams(compiled.symbols) : []
-  const win = preset.win ?? [-1, 2]
+  const win = preset.win ?? DEFAULT_WIN
 
   // ---- "连续"参考信号（密集采样）----
   const dense = useMemo(() => {
@@ -106,6 +117,9 @@ export default function SamplingLab() {
 
   // ---- 读数 ----
   const fsEff = grid ? grid.fsEff : fs
+  const challengeFixture = presetId === CHALLENGE_PRESET.id && expr === CHALLENGE_PRESET.expr &&
+    params.f0 === SAMPLE_CHALLENGE.lowTone && params.b === SAMPLE_CHALLENGE.highTone
+  const challengeStatus = !challengeFixture ? 'fixture' : !prediction ? 'choose' : samplingChallenge(prediction, fsEff)
   const aliasText = useMemo(() => {
     const items: string[] = []
     const f0 = params.f0
@@ -234,17 +248,19 @@ export default function SamplingLab() {
     params: { ...params },
     fs,
     showRecon,
+    challenge,
+    prediction,
   })
   const snapshotApply = (d: Record<string, unknown>) => {
     const pid = str(d, 'presetId', PRESETS[0].id)
-    setPresetId(PRESETS.some((p) => p.id === pid) ? pid : PRESETS[0].id)
-    deferApply(() => {
-      const e = str(d, 'expr', '')
-      if (e) setExpr(e)
-      setParams(numRecord(d, 'params', PARAM_KEYS, { ...DEFAULT_PARAMS, ...preset.params }) as Params)
-      setFs(num(d, 'fs', fs, 0.5, 40))
-      setShowRecon(bool(d, 'showRecon', showRecon))
-    })
+    const restoredPreset = PRESETS.find((p) => p.id === pid) ?? PRESETS[0]
+    setPresetId(restoredPreset.id)
+    setExpr(str(d, 'expr', restoredPreset.expr))
+    setParams(numRecord(d, 'params', PARAM_KEYS, { ...DEFAULT_PARAMS, ...restoredPreset.params }) as Params)
+    setFs(num(d, 'fs', fs, 0.5, 40))
+    setShowRecon(bool(d, 'showRecon', showRecon))
+    setChallenge(bool(d, 'challenge', false))
+    setPrediction(Math.round(num(d, 'prediction', 0, 0, 5)))
   }
 
   const main = (
@@ -339,6 +355,34 @@ export default function SamplingLab() {
         <Slider label={t('sampling.fsSlider')} min={0.5} max={40} step={0.1} value={fs} onChange={setFs} unit="Hz" />
         <Toggle checked={showRecon} onChange={setShowRecon} label={t('sampling.showRecon')} />
         <Note>{t('sampling.ctlNote')}</Note>
+      </Panel>
+      <Panel title={t('sampling.challenge.title')}>
+        {!challenge ? (
+          <Btn onClick={startChallenge}>{t('sampling.challenge.start')}</Btn>
+        ) : (
+          <>
+            <Note>{t('sampling.challenge.goal', { ...SAMPLE_CHALLENGE })}</Note>
+            <Field label={t('sampling.challenge.question', { ...SAMPLE_CHALLENGE })}>
+              <Select
+                value={String(prediction)}
+                onChange={(value) => setPrediction(Number(value))}
+                options={[
+                  { value: '0', label: t('sampling.challenge.select') },
+                  ...[1, 2, 3, 4, 5].map((hz) => ({ value: String(hz), label: `${hz} Hz` })),
+                ]}
+              />
+            </Field>
+            <div role="status">
+              <Badge tone={challengeStatus === 'complete' ? 'ok' : 'info'}>
+                {t(`sampling.challenge.${challengeStatus}`, { fs: fsEff.toFixed(2) })}
+              </Badge>
+            </div>
+            <div className="btn-row">
+              <Btn onClick={startChallenge}>{t('sampling.challenge.reset')}</Btn>
+              <Btn onClick={() => setChallenge(false)}>{t('sampling.challenge.leave')}</Btn>
+            </div>
+          </>
+        )}
       </Panel>
       <Panel title={t('common.snapshot')}>
         <SnapshotIO view="sampling" build={snapshotBuild} apply={snapshotApply} />

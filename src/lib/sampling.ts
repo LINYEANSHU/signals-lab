@@ -19,6 +19,15 @@ export function aliasFreq(f: number, fs: number): number {
   return Math.min(folded, fs / 2)
 }
 
+export const SAMPLE_CHALLENGE = { startRate: 10, lowTone: 3, highTone: 7, maxRate: 16 }
+
+export function samplingChallenge(prediction: number, fs: number) {
+  if (prediction !== aliasFreq(SAMPLE_CHALLENGE.highTone, SAMPLE_CHALLENGE.startRate)) return 'prediction'
+  if (fs <= 2 * SAMPLE_CHALLENGE.highTone) return 'undersampled'
+  if (fs > SAMPLE_CHALLENGE.maxRate) return 'over-budget'
+  return 'complete'
+}
+
 /**
  * 在 [ta, tb] 上按采样率 fs（Hz）生成采样网格。
  * n = round(T·fs) + 1 个点（首尾都在窗上），实际有效采样率 = (n-1)/T。
@@ -50,15 +59,27 @@ export function sincInterp(
   const outRe = new Float64Array(M)
   const outIm = new Float64Array(M)
   for (let j = 0; j < M; j++) {
-    const t = tOut[j]
+    const u = (tOut[j] - t0) / dt
+    const nearest = Math.round(u)
+    const offset = u - nearest
+    if (Math.abs(offset) <= Number.EPSILON * Math.max(1, Math.abs(u)) * 4) {
+      if (nearest >= 0 && nearest < N) {
+        outRe[j] = re[nearest]
+        outIm[j] = im[nearest]
+      }
+      continue
+    }
+    // sin(π(u−n)) differs only in sign across integer n. Reduce around the
+    // nearest sample to keep good accuracy for outputs close to the grid.
+    let numerator = Math.sin(Math.PI * offset) / Math.PI
+    if (nearest % 2 !== 0) numerator = -numerator
     let sr = 0
     let si = 0
     for (let n = 0; n < N; n++) {
-      const s = sinc((t - (t0 + n * dt)) / dt)
-      if (s !== 0) {
-        sr += re[n] * s
-        si += im[n] * s
-      }
+      const s = numerator / (u - n)
+      sr += re[n] * s
+      si += im[n] * s
+      numerator = -numerator
     }
     outRe[j] = sr
     outIm[j] = si

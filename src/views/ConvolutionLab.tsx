@@ -7,7 +7,7 @@ import { ExpSection, Explanation, Tex } from '../components/Tex'
 import { LabLayout } from '../components/LabLayout'
 import { useI18n, pickLabel, pickNote, listSep } from '../i18n'
 import { compileSignal, makeSampler, DEFAULT_PARAMS, PARAM_KEYS, type Domain, type Params } from '../lib/parser'
-import { deferApply, num, numRecord, str } from '../lib/snapshot'
+import { bool, deferApply, num, numRecord, str } from '../lib/snapshot'
 import { sampleCT, sampleDT, ndft, linspace, convolve, type Sampled } from '../lib/numeric'
 import { CT_CONV, DT_CONV, type ConvPreset } from '../lib/presets'
 import { C, axis, baseLayout } from '../lib/plotTheme'
@@ -90,17 +90,23 @@ export default function ConvolutionLab() {
     presetId,
     params: { ...params },
     speed,
+    playing,
+    frame: scrub,
   })
   const snapshotApply = (d: Record<string, unknown>) => {
     const dom = str(d, 'domain', domain, ['ct', 'dt']) as Domain
     const list = dom === 'ct' ? CT_CONV : DT_CONV
     const pid = str(d, 'presetId', list[0].id)
+    const restoredPreset = list.find((p) => p.id === pid) ?? list[0]
     setDomain(dom)
-    setPresetId(list.some((p) => p.id === pid) ? pid : list[0].id)
+    setPresetId(restoredPreset.id)
     // 等 [presetId, domain] 的预设副作用先跑完，再覆盖为导入值
     deferApply(() => {
-      setParams(numRecord(d, 'params', PARAM_KEYS, DEFAULT_PARAMS) as Params)
+      setParams(numRecord(d, 'params', PARAM_KEYS, { ...DEFAULT_PARAMS, ...restoredPreset.params }) as Params)
       setSpeed(num(d, 'speed', speed, 0.25, 4))
+      setPlaying(bool(d, 'playing', playing))
+      kRef.current = Math.round(num(d, 'frame', kRef.current, 0, 2 * N_CONV - 2))
+      setScrub(kRef.current)
     })
   }
   const kRef = useRef(0)

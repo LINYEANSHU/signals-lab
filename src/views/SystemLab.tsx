@@ -559,6 +559,7 @@ export default function SystemLab() {
     inputKind,
     fIn,
     wIn,
+    inExpr,
     simT,
     simN,
   })
@@ -586,6 +587,7 @@ export default function SystemLab() {
       setInputKind(str(d, 'inputKind', inputKind, ['impulse', 'step', 'sin', 'custom']) as typeof inputKind)
       setFIn(num(d, 'fIn', fIn, 0.05, 3))
       setWIn(num(d, 'wIn', wIn, 0.02, 3.1))
+      setInExpr(str(d, 'inExpr', inExpr))
       setSimT(num(d, 'simT', simT, 2, 14))
       setSimN(Math.round(num(d, 'simN', simN, 32, 200)))
     })

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { decodeSnapshot, encodeSnapshot } from '../lib/snapshot'
+import { decodeSnapshot, encodeSnapshot, readCheckpoint, writeCheckpoint } from '../lib/snapshot'
 import { useI18n } from '../i18n'
 
 /** 左侧/通用卡片容器 */
@@ -221,6 +221,32 @@ export function SnapshotIO({
     timerRef.current = window.setTimeout(() => setMsg(''), 2600)
   }
 
+  const saveLocal = () => {
+    try {
+      if (writeCheckpoint(view, build())) {
+        show(t('ui.checkpointSaved'))
+        return
+      }
+    } catch {
+      // A snapshot builder can fail independently of storage.
+    }
+    show(t('ui.checkpointSaveFailed'), 'err')
+  }
+
+  const restoreLocal = () => {
+    const result = readCheckpoint(view)
+    if (result.status !== 'ready') {
+      show(t(`ui.checkpoint.${result.status}`), 'err')
+      return
+    }
+    try {
+      apply(result.data)
+      show(t('ui.checkpointRestored'))
+    } catch {
+      show(t('ui.ioImportFail'), 'err')
+    }
+  }
+
   const doExport = () => {
     try {
       const json = encodeSnapshot(view, build())
@@ -264,6 +290,10 @@ export function SnapshotIO({
 
   return (
     <div className="snapshot-io">
+      <div className="btn-row">
+        <Btn onClick={saveLocal} title={t('ui.checkpointSaveTitle')}>{t('ui.checkpointSave')}</Btn>
+        <Btn onClick={restoreLocal} title={t('ui.checkpointRestoreTitle')}>{t('ui.checkpointRestore')}</Btn>
+      </div>
       <div className="btn-row">
         <Btn onClick={doExport} title={t('ui.ioExportTitle')}>
           {t('ui.ioExport')}

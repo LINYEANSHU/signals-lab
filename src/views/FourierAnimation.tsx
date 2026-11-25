@@ -297,20 +297,25 @@ export default function FourierAnimation() {
     compare,
     w1,
     speed,
+    playing,
+    frame: scrub,
   })
   const snapshotApply = (d: Record<string, unknown>) => {
     const pid = str(d, 'presetId', ANIM_PRESETS[0].id)
-    setPresetId(ANIM_PRESETS.some((p) => p.id === pid) ? pid : ANIM_PRESETS[0].id)
+    const restoredPreset = ANIM_PRESETS.find((p) => p.id === pid) ?? ANIM_PRESETS[0]
+    setPresetId(restoredPreset.id)
     // 等 [presetId] 的预设副作用先跑完，再覆盖为导入值
     deferApply(() => {
-      const e = str(d, 'expr', '')
-      if (e) setExpr(e)
-      setParams(numRecord(d, 'params', PARAM_KEYS, DEFAULT_PARAMS) as Params)
+      setExpr(str(d, 'expr', restoredPreset.expr))
+      setParams(numRecord(d, 'params', PARAM_KEYS, { ...DEFAULT_PARAMS, ...restoredPreset.params }) as Params)
       setWmax(num(d, 'wmax', wmax, 2, 60))
       setW0(num(d, 'w0', w0, 0, 60))
       setCompare(bool(d, 'compare', compare))
       setW1(num(d, 'w1', w1, 0, 60))
       setSpeed(num(d, 'speed', speed, 0.25, 4))
+      setPlaying(bool(d, 'playing', playing))
+      kRef.current = Math.round(num(d, 'frame', kRef.current, 0, N_ANIM - 1))
+      setScrub(kRef.current)
     })
   }
 
